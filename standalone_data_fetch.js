@@ -83,38 +83,46 @@ function compare(old_listings, new_listings) {
 }
 
 function update_db(listings) {
-  let api_key =
-    "Bearer e5f69ccba39fbb52d79d005be8b105786fe29f245e032b67755a339b2585a68820bfaa6cd4d3e634451a384e5ce5329e77395082a5205ea76ac5dff603e163efe3b2967b7c1437c94c0f6ee4b1fd064a49dc39558687807bece4fcfbef9fa41abd8cf57ed45b07d484e902656dceee1832298b92c1eb84792c5d2572afd36b4d";
+  let api_key = "Bearer f7aa35d133655555be580f3621c927a6cfa89c506c6af3669fd8ec0907da0265de09dca6fa0d532482e1cbd62578615450390ce799e75142cdd71ce4378ccdd170171422b864c9f80cae7e190564e3fe3fcd4de8ee80a2afe27ea8e983e0a86e4045c6cdbebf86b1635f1af73128e3e580067411e5b5f71faa092e8f5eb1b3c1";
   let url = "https://driven-properties-strapi.herokuapp.com/api/listings";
 
   listings.forEach((item) => {
-    console.log(item);
     let method_ = null;
     if (item.event == "update") {
-      method_ = "put";
+      method_ = "PUT";
     } else {
-      method_ = "post";
+      method_ = "POST";
     }
-
+    
     axios({
       method: method_,
       url: url,
-      data: {
-        data: item.data,
-      },
+      data: {data:item},
       headers: {
-        Authorization: api_key,
+        "Authorization": api_key,
+        "Content-Type":"application/json"
+
       },
     })
       .then((resp) => {
-        console.log(resp.status);
+        if(resp.status == 200)
+        {
+            console.log(resp.status)
+        }
+        else{
+            console.log(resp)
+        }
       })
       .catch(function (error) {
-        console.log(error);
+        console.log(error.response);
       });
   });
 }
-
+function sleep(ms) {
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
+  }
 function saveFile(parsed_listings) {
   fs.writeFile(file_path, JSON.stringify(parsed_listings), (err) => {
     if (err) {
