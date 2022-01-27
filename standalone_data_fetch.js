@@ -7,12 +7,16 @@ let backup_dir = "./backup";
 
 let file_path = backup_dir + "/data.json";
 
+let img_dir = "./images"
+
 if (!fs.existsSync(backup_dir)) {
   fs.mkdirSync(backup_dir);
 }
-//
 
-//
+if (!fs.existsSync(img_dir)) {
+  fs.mkdirSync(img_dir);
+}
+
 
 main();
 
@@ -97,7 +101,7 @@ function update_db(listings) {
     axios({
       method: method_,
       url: url,
-      data: {data:item},
+      data: {data:item.listing},
       headers: {
         "Authorization": api_key,
         "Content-Type":"application/json"
@@ -107,7 +111,18 @@ function update_db(listings) {
       .then((resp) => {
         if(resp.status == 200)
         {
-            console.log(resp.status)
+            let url = "https://driven-properties-strapi.herokuapp.com/api/upload"
+
+            let listing_id = resp.data.id
+            
+            item.images.forEach(image => {
+
+
+
+            })
+            
+            
+
         }
         else{
             console.log(resp)
@@ -118,6 +133,11 @@ function update_db(listings) {
       });
   });
 }
+
+function download_image(url){
+  
+}
+
 function sleep(ms) {
     return new Promise((resolve) => {
       setTimeout(resolve, ms);
@@ -138,11 +158,12 @@ function parse_listing(listing) {
 
   for (const [key, v] of Object.entries(listing)) {
     let value = v[0];
+    let images = [];
 
     if (key == "Listing_Date" || key == "Last_Updated") {
       temp[key] = new Date(value);
     } else if (key == "Images") {
-      let images = [];
+      
       try {
         value["image"].forEach((image) => {
           images.push(image);
@@ -151,7 +172,7 @@ function parse_listing(listing) {
         console.log(`images : ${err}`);
       }
 
-      temp[key] = images;
+      
       //  image
     } else if (key == "Facilities") {
       let facilities = [];
@@ -183,5 +204,5 @@ function parse_listing(listing) {
     }
   }
 
-  return temp;
+  return {"listing":temp,"images":images};
 }
